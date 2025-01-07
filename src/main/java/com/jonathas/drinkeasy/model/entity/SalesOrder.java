@@ -29,4 +29,8 @@ public class SalesOrder {
         }
         return totalValue;
     }
+
+    public void updateStatus(String newStatus){
+        this.status = newStatus;
+    }
 }
