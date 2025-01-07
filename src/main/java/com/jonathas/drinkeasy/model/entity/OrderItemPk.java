@@ -1,11 +1,20 @@
 package com.jonathas.drinkeasy.model.entity;
 
 import jakarta.persistence.Embeddable;
-import java.util.UUID;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Data;
 
+import java.util.UUID;
+@Data
 @Embeddable
 public class OrderItemPk {
 
-    private UUID productId;
-    private UUID salesOrderId;
+    @ManyToOne
+    @JoinColumn(name = "salesorder_id")
+    private SalesOrder salesOrder;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 }

@@ -17,8 +17,10 @@ public class SalesOrder {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private Date date;
+    @ManyToOne
+    @JoinColumn(name = "client_id")
     private Client client;
-    @OneToMany(mappedBy = "id.product")
+    @OneToMany(mappedBy = "salesOrder")
     private Set<OrderItem> products = new HashSet<>();
     private Double totalValue = 0.0;
     private String status;

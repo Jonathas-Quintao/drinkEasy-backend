@@ -1,25 +1,24 @@
-package com.jonathas.drinkeasy.model.entity;
+package com.jonathas.drinkeasy.model.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_client")
-public class Client {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@NoArgsConstructor
+public class ClientDTO {
+    @JsonSerialize(using = ToStringSerializer.class)
     private UUID id;
     private String name;
     private Boolean type;
     private String document;
     private String phone;
     private String address;
-
 
     public UUID getId() {
         return id;

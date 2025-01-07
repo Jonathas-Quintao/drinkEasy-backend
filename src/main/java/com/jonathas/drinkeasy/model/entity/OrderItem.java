@@ -15,11 +15,17 @@ import java.util.UUID;
 public class OrderItem {
     @EmbeddedId
     private OrderItemPk id;
+
+    private Integer amount;
+    private Double unitValue;
+
     @ManyToOne
     @JoinColumn(name = "product_id", insertable = false, updatable = false)
     private Product product;
-    private Integer amount;
-    private Double unitValue;
+
+    @ManyToOne
+    @JoinColumn(name = "sales_order_id", insertable = false, updatable = false)
+    private SalesOrder salesOrder;
 
     public Double calcSubtotal(){
         return unitValue * amount;
