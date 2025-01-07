@@ -13,9 +13,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "tb_orderitem")
 public class OrderItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @EmbeddedId
+    private OrderItemPk id;
+    @ManyToOne
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
     private Product product;
     private Integer amount;
     private Double unitValue;
