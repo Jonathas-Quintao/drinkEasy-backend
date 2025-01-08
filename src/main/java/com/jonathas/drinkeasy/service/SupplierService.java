@@ -6,6 +6,7 @@ import com.jonathas.drinkeasy.model.entity.Client;
 import com.jonathas.drinkeasy.model.entity.Supplier;
 import com.jonathas.drinkeasy.repository.SupplierRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,17 @@ public class SupplierService {
                 .collect(Collectors.toList());
     }
 
-    public SupplierDTO findById(UUID id){
+    public Optional<SupplierDTO> findById(@NotNull UUID id){
+
+        if(id == null){
+            throw new IllegalArgumentException("The given id must not be null");
+        }
+
         Optional<Supplier> supplier = supplierRepository.findById(id);
         if(!supplier.isPresent()){
             throw new SupplierNotFoundException("Supplier not found!");
         }
-        return convertToDTO(supplier.get());
+        return Optional.of(convertToDTO(supplier.get()));
     }
 
     @Transactional
@@ -47,6 +53,28 @@ public class SupplierService {
     }
 
     @Transactional
+    public SupplierDTO update(UUID id, SupplierDTO supplierDTO){
+        Optional<Supplier> optionalSupplier = supplierRepository.findById(id);
+
+        if(!optionalSupplier.isPresent()){
+            throw new SupplierNotFoundException("Supplier not found");
+        }
+
+        Supplier existingSupplier = optionalSupplier.get();
+
+        existingSupplier.setName(supplierDTO.getName());
+        existingSupplier.setCnpj(supplierDTO.getCnpj());
+        existingSupplier.setPhone(supplierDTO.getPhone());
+        existingSupplier.setAddress(supplierDTO.getAddress());
+
+        Supplier updatedSupplier = supplierRepository.save(existingSupplier);
+
+        return convertToDTO(updatedSupplier);
+    }
+
+
+
+    @Transactional
     public SupplierDTO save(SupplierDTO supplierDTO){
         Supplier supplier = create(supplierDTO);
 
@@ -54,10 +82,6 @@ public class SupplierService {
 
         return convertToDTO(savedSupplier);
     }
-
-
-
-
 
     private SupplierDTO convertToDTO(Supplier supplier){
         SupplierDTO supplierDTO = new SupplierDTO();

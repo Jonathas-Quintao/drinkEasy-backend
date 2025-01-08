@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +38,28 @@ public class ClientService {
             throw new ClientNotFoundException("Client not found!");
         }
         return Optional.of(convertToDTO(client.get()));
+    }
+
+    @Transactional
+    public ClientDTO update(UUID id, ClientDTO clientDTO){
+        Optional<Client> optionalClient = clientRepository.findById(id);
+
+        if(!optionalClient.isPresent()){
+            throw new ClientNotFoundException("Client not found");
+        }
+
+        Client existingClient = optionalClient.get();
+
+        existingClient.setName(clientDTO.getName());
+        existingClient.setType(clientDTO.getType());
+        existingClient.setAddress(clientDTO.getAddress());
+        existingClient.setPhone(clientDTO.getPhone());
+        existingClient.setDocument(clientDTO.getDocument());
+
+
+        Client updatedClient = clientRepository.save(existingClient);
+
+        return convertToDTO(updatedClient);
     }
 
     @Transactional
@@ -74,8 +95,6 @@ public class ClientService {
 
     public Client create(ClientDTO clientDTO){
         ModelMapper modelMapper = new ModelMapper();
-        Client clientEntity = modelMapper.map(clientDTO, Client.class);
-        return clientEntity;
-
+        return modelMapper.map(clientDTO, Client.class);
     }
 }
