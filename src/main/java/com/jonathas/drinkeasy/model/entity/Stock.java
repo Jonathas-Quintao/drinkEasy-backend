@@ -19,8 +19,8 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-
-    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
+    private String name;
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL)
 
     private List<StockProduct> stockProducts = new ArrayList<>();
 
@@ -32,7 +32,31 @@ public void removeProduct(StockProduct product){
     this.stockProducts.remove(product);
 }
 
-public List<StockProduct> checkStock(){
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<StockProduct> getStockProducts() {
+        return stockProducts;
+    }
+
+    public void setStockProducts(List<StockProduct> stockProducts) {
+        this.stockProducts = stockProducts;
+    }
+
+    public List<StockProduct> checkStock(){
     return this.stockProducts;
 }
 
