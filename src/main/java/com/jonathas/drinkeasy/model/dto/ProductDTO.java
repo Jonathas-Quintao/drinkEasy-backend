@@ -1,6 +1,7 @@
-package com.jonathas.drinkeasy.model.entity;
+package com.jonathas.drinkeasy.model.dto;
 
-import jakarta.persistence.*;
+
+import com.jonathas.drinkeasy.model.entity.Stock;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,14 +9,10 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.UUID;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_product")
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+@NoArgsConstructor
+public class ProductDTO {
     private UUID id;
     private String name;
     private Integer price;
@@ -30,7 +27,6 @@ public class Product {
     public UUID getId() {
         return id;
     }
-
     public void setId(UUID id) {
         this.id = id;
     }

@@ -18,22 +18,22 @@ public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private Integer amount;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "stock_id")
-    private List<Product> productList = new ArrayList<>();
 
-public void addProduct(Product product){
-    this.productList.add(product);
+    @OneToMany(mappedBy = "stock", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    private List<StockProduct> stockProducts = new ArrayList<>();
+
+public void addProduct(StockProduct product){
+    this.stockProducts.add(product);
 }
 
-public void removeProduct(Product product){
-    this.productList.remove(product);
+public void removeProduct(StockProduct product){
+    this.stockProducts.remove(product);
 }
 
-public List<Product> checkStock(){
-    return this.productList;
+public List<StockProduct> checkStock(){
+    return this.stockProducts;
 }
 
 //public Boolean checkSlowStock(Product product){
