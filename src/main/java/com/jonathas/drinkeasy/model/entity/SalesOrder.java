@@ -15,16 +15,16 @@ import java.util.*;
 public class SalesOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id; // ID do pedido
-    private Date date; // Data do pedido
+    private UUID id;
+    private Date date;
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client; // Cliente relacionado ao pedido
+    private Client client;
     @OneToMany(mappedBy = "id.salesOrder", cascade = CascadeType.ALL)
-    private Set<OrderItem> products = new HashSet<>(); // Produtos no pedido
-    private Double totalValue = 0.0; // Valor total do pedido
+    private Set<OrderItem> products = new HashSet<>();
+    private Double totalValue = 0.0;
     @Enumerated(EnumType.STRING)
-    private OrderStatus status; // Status do pedido
+    private OrderStatus status;
 
     // Construtores
     public SalesOrder(Date date, Client client) {

@@ -12,10 +12,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItemDTO {
-    private UUID productId; // Reflete explicitamente o ID do produto
-    private String productName; // Nome do produto (opcional, mas útil)
-    private Integer amount; // Quantidade do item
-    private Double unitValue; // Valor unitário
+    private UUID productId;
+    private String productName;
+    private Integer amount;
+    private Double unitValue;
 
     public UUID getProductId() {
         return productId;

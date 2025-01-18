@@ -56,16 +56,16 @@ public class SalesOrderService {
         }
         SalesOrder existingSalesOrder = optionalSalesOrder.get();
 
-        // Atualiza os campos com base no DTO
+
         existingSalesOrder.setDate(salesOrderDTO.getDate());
         existingSalesOrder.setStatus(salesOrderDTO.getStatus());
 
-        // Atualiza o cliente apenas pelo ID
+
         Client client = clientRepository.findById(salesOrderDTO.getClientId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
         existingSalesOrder.setClient(client);
 
-        // Processamento dos itens do pedido
+
         Set<OrderItem> updatedItems = salesOrderDTO.getProducts().stream().map(itemDTO -> {
             Product product = productRepository.findById(itemDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
@@ -84,7 +84,7 @@ public class SalesOrderService {
 
         existingSalesOrder.setProducts(updatedItems);
 
-        // Cálculo do valor total
+
         double totalValue = updatedItems.stream()
                 .mapToDouble(OrderItem::calcSubtotal)
                 .sum();
@@ -118,12 +118,12 @@ public class SalesOrderService {
         salesOrder.setDate(salesOrderDTO.getDate());
         salesOrder.setStatus(salesOrderDTO.getStatus());
 
-        // Busca e atribuição do cliente
+
         Client client = clientRepository.findById(salesOrderDTO.getClientId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
         salesOrder.setClient(client);
 
-        // Processamento dos itens do pedido
+
         Set<OrderItem> orderItems = salesOrderDTO.getProducts().stream().map(itemDTO -> {
             Product product = productRepository.findById(itemDTO.getProductId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
@@ -142,7 +142,7 @@ public class SalesOrderService {
 
         salesOrder.setProducts(orderItems);
 
-        // Cálculo do valor total
+
         double totalValue = orderItems.stream()
                 .mapToDouble(OrderItem::calcSubtotal)
                 .sum();
@@ -154,10 +154,10 @@ public class SalesOrderService {
     public SalesOrderDTO convertToDTO(SalesOrder salesOrder){
         SalesOrderDTO salesOrderDTO = new SalesOrderDTO();
         salesOrderDTO.setId(salesOrder.getId());
-        salesOrderDTO.setClientId(salesOrder.getClient().getId()); // Usando apenas o clientId
+        salesOrderDTO.setClientId(salesOrder.getClient().getId());
         salesOrderDTO.setDate(salesOrder.getDate());
         salesOrderDTO.setProducts(salesOrder.getProducts().stream()
-                .map(this::convertToOrderItemDTO) // Converter cada OrderItem em OrderItemDTO
+                .map(this::convertToOrderItemDTO)
                 .collect(Collectors.toList()));
         salesOrderDTO.setStatus(salesOrder.getStatus());
         salesOrderDTO.setTotalValue(salesOrder.getTotalValue());
