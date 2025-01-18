@@ -60,7 +60,4 @@ public void removeProduct(StockProduct product){
     return this.stockProducts;
 }
 
-//public Boolean checkSlowStock(Product product){
-//    return product.getCurrentStock() <= product.getMinimalStock();
-//}
 }

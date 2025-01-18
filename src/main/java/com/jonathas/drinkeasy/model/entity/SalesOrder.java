@@ -1,5 +1,6 @@
 package com.jonathas.drinkeasy.model.entity;
 
+import com.jonathas.drinkeasy.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,30 +10,103 @@ import java.util.*;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tb_SalesOrder")
 public class SalesOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    private Date date;
+    private UUID id; // ID do pedido
+    private Date date; // Data do pedido
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client;
-    @OneToMany(mappedBy = "salesOrder")
-    private Set<OrderItem> products = new HashSet<>();
-    private Double totalValue = 0.0;
-    private String status;
+    private Client client; // Cliente relacionado ao pedido
+    @OneToMany(mappedBy = "id.salesOrder", cascade = CascadeType.ALL)
+    private Set<OrderItem> products = new HashSet<>(); // Produtos no pedido
+    private Double totalValue = 0.0; // Valor total do pedido
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status; // Status do pedido
 
-    public Double calcTotalValue(){
-        for(OrderItem a : products){
-         this.totalValue += a.calcSubtotal();
-        }
-        return totalValue;
+    // Construtores
+    public SalesOrder(Date date, Client client) {
+        this.date = date;
+        this.client = client;
+        this.status = OrderStatus.PENDING;
     }
 
-    public void updateStatus(String newStatus){
+    public SalesOrder(){
+        this.status = OrderStatus.PENDING;
+        this.products = new HashSet<>();
+    }
+
+    // Métodos de getter e setter
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public Set<OrderItem> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<OrderItem> products) {
+        this.products = products;
+    }
+
+    public void setTotalValue(Double totalValue) {
+        this.totalValue = totalValue;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    // Método para calcular o valor total dos produtos
+    public Double getTotalValue() {
+        if (products == null || products.isEmpty()) {
+            return 0.0;
+        }
+        return products.stream()
+                .mapToDouble(OrderItem::calcSubtotal)
+                .sum();
+    }
+
+    // Atualizar status do pedido
+    public void updateStatus(OrderStatus newStatus){
         this.status = newStatus;
+    }
+
+    // Adicionar produto ao pedido
+    public void addProduct(OrderItem product){
+        this.products.add(product);
+        this.totalValue += product.calcSubtotal();
+    }
+
+    // Remover produto do pedido
+    public void removeProduct(OrderItem product){
+        this.products.remove(product);
+        this.totalValue -= product.calcSubtotal();
     }
 }
