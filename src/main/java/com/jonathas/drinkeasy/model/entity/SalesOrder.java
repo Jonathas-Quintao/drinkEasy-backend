@@ -93,18 +93,18 @@ public class SalesOrder {
                 .sum();
     }
 
-    // Atualizar status do pedido
+
     public void updateStatus(OrderStatus newStatus){
         this.status = newStatus;
     }
 
-    // Adicionar produto ao pedido
+
     public void addProduct(OrderItem product){
         this.products.add(product);
         this.totalValue += product.calcSubtotal();
     }
 
-    // Remover produto do pedido
+
     public void removeProduct(OrderItem product){
         this.products.remove(product);
         this.totalValue -= product.calcSubtotal();

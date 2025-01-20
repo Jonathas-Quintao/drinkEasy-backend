@@ -13,7 +13,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OrderItemDTO {
     private UUID productId;
-    private String productName;
     private Integer amount;
     private Double unitValue;
 
@@ -24,15 +23,6 @@ public class OrderItemDTO {
     public void setProductId(UUID productId) {
         this.productId = productId;
     }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
     public UUID getId() {
         return productId;
     }
@@ -56,6 +46,8 @@ public class OrderItemDTO {
     public void setUnitValue(Double unitValue) {
         this.unitValue = unitValue;
     }
+
+
 
 
 }

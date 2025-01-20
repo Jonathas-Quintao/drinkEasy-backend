@@ -1,6 +1,8 @@
 package com.jonathas.drinkeasy.controller;
 
+import com.jonathas.drinkeasy.model.dto.OrderItemDTO;
 import com.jonathas.drinkeasy.model.dto.SalesOrderDTO;
+import com.jonathas.drinkeasy.model.entity.OrderItem;
 import com.jonathas.drinkeasy.model.entity.SalesOrder;
 import com.jonathas.drinkeasy.service.SalesOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,14 @@ public class SalesOrderController {
     public ResponseEntity<SalesOrderDTO> post(@RequestBody SalesOrderDTO salesOrderDTO){
         Optional<SalesOrderDTO> salesOrder = Optional.ofNullable(salesOrderService.save(salesOrderDTO));
         return new ResponseEntity<>(salesOrder.get(), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/add-product")
+    public ResponseEntity<SalesOrderDTO> addProductToOrder(
+            @PathVariable UUID id,
+            @RequestBody OrderItemDTO productDTO) {
+        SalesOrderDTO updatedOrder = salesOrderService.addProduct(id, productDTO);
+        return ResponseEntity.ok(updatedOrder);
     }
 
 }
