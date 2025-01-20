@@ -49,15 +49,15 @@ public class SalesOrderService {
 
     @Transactional
     public SalesOrderDTO addProduct(UUID salesOrderId, OrderItemDTO productDTO) {
-        // 1. Verificar se o pedido existe
+
         SalesOrder salesOrder = salesOrderRepository.findById(salesOrderId)
                 .orElseThrow(() -> new RuntimeException("Sales Order não encontrado."));
 
-        // 2. Verificar se o produto existe
+
         Product product = productRepository.findById(productDTO.getProductId())
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
 
-        // 3. Criar um novo OrderItem
+
         OrderItem orderItem = new OrderItem();
         OrderItemPk orderItemPk = new OrderItemPk();
         orderItemPk.setSalesOrder(salesOrder);
@@ -67,40 +67,54 @@ public class SalesOrderService {
         orderItem.setAmount(productDTO.getAmount());
         orderItem.setUnitValue(productDTO.getUnitValue());
 
-        // 4. Adicionar o produto ao pedido
+
         salesOrder.getProducts().add(orderItem);
 
-        // 5. Recalcular o valor total do pedido
+
         double totalValue = salesOrder.getProducts().stream()
                 .mapToDouble(OrderItem::calcSubtotal)
                 .sum();
         salesOrder.setTotalValue(totalValue);
 
-        // 6. Salvar o pedido atualizado
+
         salesOrderRepository.save(salesOrder);
 
-        // 7. Converter e retornar o DTO
+
         return convertToDTO(salesOrder);
     }
 
     @Transactional
-    public SalesOrderDTO removeProduct(UUID id, OrderItemDTO productDTO){
-        Optional<SalesOrder> salesOrder = salesOrderRepository.findById(id);
-        if(!salesOrder.isPresent()){
-            throw new SalesOrderNotFoundException("Sales Order not found");
-        }
-        SalesOrder existingSalesOrder = salesOrder.get();
-        OrderItem productToRemove = existingSalesOrder.getProducts().stream()
-                .filter(item -> item.getId().getProduct().equals(productDTO.getProductId()))
+    public SalesOrderDTO removeProduct(UUID id, OrderItemDTO productDTO) {
+
+        SalesOrder salesOrder = salesOrderRepository.findById(id)
+                .orElseThrow(() -> new SalesOrderNotFoundException("Sales Order not found"));
+
+
+        OrderItem productToRemove = salesOrder.getProducts().stream()
+                .filter(item -> item.getId().getProduct().getId().equals(productDTO.getProductId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Product not found in this Sales Order"));
+
+
         if (productDTO.getAmount() >= productToRemove.getAmount()) {
-            existingSalesOrder.removeProduct(productToRemove);
+
+            salesOrder.getProducts().remove(productToRemove);
         } else {
+
             productToRemove.setAmount(productToRemove.getAmount() - productDTO.getAmount());
         }
-        salesOrderRepository.save(existingSalesOrder);
-        return convertToDTO(existingSalesOrder);
+
+
+        double totalValue = salesOrder.getProducts().stream()
+                .mapToDouble(OrderItem::calcSubtotal)
+                .sum();
+        salesOrder.setTotalValue(totalValue);
+
+
+        salesOrderRepository.save(salesOrder);
+
+
+        return convertToDTO(salesOrder);
     }
     @Transactional
     public SalesOrderDTO update(UUID id, SalesOrderDTO salesOrderDTO){

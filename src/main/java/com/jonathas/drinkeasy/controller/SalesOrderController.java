@@ -51,4 +51,12 @@ public class SalesOrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+    @PutMapping("/{id}/remove-product")
+    public ResponseEntity<SalesOrderDTO> removeProductFromOrder(
+            @PathVariable UUID id,
+            @RequestBody OrderItemDTO productDTO) {
+        SalesOrderDTO updatedOrder = salesOrderService.removeProduct(id, productDTO);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
 }
