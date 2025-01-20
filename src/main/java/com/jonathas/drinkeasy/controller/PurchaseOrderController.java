@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/purchase-orders")
@@ -25,6 +26,11 @@ public class PurchaseOrderController {
     public ResponseEntity<List<PurchaseOrderDTO>> findAll(){
         List<PurchaseOrderDTO> purchaseOrders = purchaseOrderService.findAll();
         return ResponseEntity.ok(purchaseOrders);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<PurchaseOrderDTO> findById(@PathVariable("id") UUID id){
+        Optional<PurchaseOrderDTO> purchaseOrder = purchaseOrderService.findById(id);
+        return ResponseEntity.ok(purchaseOrder.get());
     }
     @PostMapping
     public ResponseEntity<PurchaseOrderDTO> post(@RequestBody PurchaseOrderDTO purchaseOrderDTO){
