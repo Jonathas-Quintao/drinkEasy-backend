@@ -6,38 +6,43 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_SalesOrder")
-public class SalesOrder {
+@Table(name = "tb_PurchaseOrder")
+public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private Date date;
+
     @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
-    @OneToMany(mappedBy = "id.salesOrder", cascade = CascadeType.ALL)
-    private Set<OrderItem> products = new HashSet<>();
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
+
+    @OneToMany(mappedBy = "id.purchaseOrder", cascade = CascadeType.ALL)
+    private Set<PurchaseItem> products = new HashSet<>();
     private Double totalValue = 0.0;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-
-    public SalesOrder(Date date, Client client) {
+    public PurchaseOrder(Date date, Supplier supplier){
         this.date = date;
-        this.client = client;
+        this.supplier = supplier;
         this.status = OrderStatus.PENDING;
     }
 
-    public SalesOrder(){
+    public PurchaseOrder(){
         this.status = OrderStatus.PENDING;
         this.products = new HashSet<>();
     }
-
 
     public UUID getId() {
         return id;
@@ -55,20 +60,29 @@ public class SalesOrder {
         this.date = date;
     }
 
-    public Client getClient() {
-        return client;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
-    public Set<OrderItem> getProducts() {
+    public Set<PurchaseItem> getProducts() {
         return products;
     }
 
-    public void setProducts(Set<OrderItem> products) {
+    public void setProducts(Set<PurchaseItem> products) {
         this.products = products;
+    }
+
+    public Double getTotalValue() {
+        if (products == null || products.isEmpty()) {
+            return 0.0;
+        }
+        return products.stream()
+                .mapToDouble(PurchaseItem::calcSubtotal)
+                .sum();
     }
 
     public void setTotalValue(Double totalValue) {
@@ -82,30 +96,18 @@ public class SalesOrder {
     public void setStatus(OrderStatus status) {
         this.status = status;
     }
-
-
-    public Double getTotalValue() {
-        if (products == null || products.isEmpty()) {
-            return 0.0;
-        }
-        return products.stream()
-                .mapToDouble(OrderItem::calcSubtotal)
-                .sum();
-    }
-
-
     public void updateStatus(OrderStatus newStatus){
         this.status = newStatus;
     }
 
 
-    public void addProduct(OrderItem product){
+    public void addProduct(PurchaseItem product){
         this.products.add(product);
         this.totalValue += product.calcSubtotal();
     }
 
 
-    public void removeProduct(OrderItem product){
+    public void removeProduct(PurchaseItem product){
         this.products.remove(product);
         this.totalValue -= product.calcSubtotal();
     }

@@ -12,13 +12,12 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalesOrderDTO {
-
+public class PurchaseOrderDTO {
     private UUID id;
     private Date date;
-    private UUID clientId;
-    private String clientName;
-    private List<OrderItemDTO> products;
+    private UUID supplierId;
+    private String supplierName;
+    private List<PurchaseItemDTO> products;
     private Double totalValue;
     private OrderStatus status;
 
@@ -38,28 +37,32 @@ public class SalesOrderDTO {
         this.date = date;
     }
 
-    public UUID getClientId() {
-        return clientId;
+    public UUID getSupplierId() {
+        return supplierId;
     }
 
-    public void setClientId(UUID clientId) {
-        this.clientId = clientId;
+    public void setSupplierId(UUID supplierId) {
+        this.supplierId = supplierId;
     }
 
-    public String getClientName() {
-        return clientName;
+    public String getSupplierName() {
+        return supplierName;
     }
 
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 
-    public List<OrderItemDTO> getProducts() {
+    public List<PurchaseItemDTO> getProducts() {
         return products;
     }
 
-    public void setProducts(List<OrderItemDTO> products) {
+    public void setProducts(List<PurchaseItemDTO> products) {
         this.products = products;
+    }
+
+    public Double getTotalValue() {
+        return totalValue;
     }
 
     public void setTotalValue(Double totalValue) {
@@ -72,14 +75,5 @@ public class SalesOrderDTO {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
-    }
-
-    public Double getTotalValue() {
-        if (products == null || products.isEmpty()) {
-            return 0.0;
-        }
-        return products.stream()
-                .mapToDouble(product -> product.getUnitValue() * product.getAmount())
-                .sum();
     }
 }
