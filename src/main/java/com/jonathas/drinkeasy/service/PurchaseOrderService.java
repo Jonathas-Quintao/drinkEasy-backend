@@ -53,29 +53,44 @@ public class PurchaseOrderService {
     }
 
     @Transactional
-    public PurchaseOrderDTO addProduct(UUID purchaseOrderId, PurchaseItemDTO productDTO){
+    public PurchaseOrderDTO addProduct(UUID purchaseOrderId, PurchaseItemDTO productDTO) {
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId)
                 .orElseThrow(() -> new RuntimeException("Purchase Order not found."));
 
         Product product = productRepository.findById(productDTO.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found."));
 
-        PurchaseItem purchaseItem = new PurchaseItem();
-        PurchaseItemPk purchaseItemPk = new PurchaseItemPk();
-        purchaseItemPk.setPurchaseOrder(purchaseOrder);
-        purchaseItemPk.setProduct(product);
 
-        purchaseItem.setId(purchaseItemPk);
-        purchaseItem.setAmount(productDTO.getAmount());
-        purchaseItem.setUnitValue(productDTO.getUnitValue());
+        Optional<PurchaseItem> existingItem = purchaseOrder.getProducts().stream()
+                .filter(item -> item.getId().getProduct().getId().equals(productDTO.getProductId()))
+                .findFirst();
 
-        purchaseOrder.getProducts().add(purchaseItem);
+        if (existingItem.isPresent()) {
+            // Atualiza o item existente
+            PurchaseItem item = existingItem.get();
+            item.setAmount(item.getAmount() + productDTO.getAmount());
+            item.setUnitValue(productDTO.getUnitValue());
+        } else {
+            // Cria um novo item
+            PurchaseItem purchaseItem = new PurchaseItem();
+            PurchaseItemPk purchaseItemPk = new PurchaseItemPk();
+            purchaseItemPk.setPurchaseOrder(purchaseOrder);
+            purchaseItemPk.setProduct(product);
 
+            purchaseItem.setId(purchaseItemPk);
+            purchaseItem.setAmount(productDTO.getAmount());
+            purchaseItem.setUnitValue(productDTO.getUnitValue());
+
+            purchaseOrder.getProducts().add(purchaseItem);
+        }
+
+        // Recalcula o valor total da ordem de compra
         double totalValue = purchaseOrder.getProducts().stream()
                 .mapToDouble(PurchaseItem::calcSubtotal)
                 .sum();
         purchaseOrder.setTotalValue(totalValue);
 
+        // Salva a ordem de compra atualizada
         purchaseOrderRepository.save(purchaseOrder);
 
         return convertToDTO(purchaseOrder);
@@ -96,6 +111,7 @@ public class PurchaseOrderService {
         }else{
             productToRemove.setAmount(productToRemove.getAmount() - productDTO.getAmount());
         }
+
 
         double totalValue = purchaseOrder.getProducts().stream()
                 .mapToDouble(PurchaseItem::calcSubtotal)

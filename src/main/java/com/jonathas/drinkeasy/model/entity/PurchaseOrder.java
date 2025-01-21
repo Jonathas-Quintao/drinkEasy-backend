@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -101,9 +98,22 @@ public class PurchaseOrder {
     }
 
 
-    public void addProduct(PurchaseItem product){
-        this.products.add(product);
-        this.totalValue += product.calcSubtotal();
+    public void addProduct(PurchaseItem product) {
+        Optional<PurchaseItem> existingItem = this.products.stream()
+                .filter(item -> item.getId().equals(product.getId()))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            PurchaseItem item = existingItem.get();
+            item.setAmount(item.getAmount() + product.getAmount());
+            item.setUnitValue(product.getUnitValue());
+        } else {
+            this.products.add(product);
+        }
+
+        this.totalValue = this.products.stream()
+                .mapToDouble(PurchaseItem::calcSubtotal)
+                .sum();
     }
 
 

@@ -1,5 +1,6 @@
 package com.jonathas.drinkeasy.controller;
 
+import com.jonathas.drinkeasy.model.dto.PurchaseItemDTO;
 import com.jonathas.drinkeasy.model.dto.PurchaseOrderDTO;
 import com.jonathas.drinkeasy.service.PurchaseOrderService;
 import org.apache.coyote.Response;
@@ -36,5 +37,11 @@ public class PurchaseOrderController {
     public ResponseEntity<PurchaseOrderDTO> post(@RequestBody PurchaseOrderDTO purchaseOrderDTO){
         Optional<PurchaseOrderDTO> purchaseOrder = Optional.ofNullable((purchaseOrderService.save(purchaseOrderDTO)));
         return new ResponseEntity<>(purchaseOrder.get(), HttpStatus.CREATED);
+    }
+
+    @PutMapping("{id}/add-product")
+    public ResponseEntity<PurchaseOrderDTO> addProductToOrder(@PathVariable UUID id, @RequestBody PurchaseItemDTO productDTO){
+        PurchaseOrderDTO updatedOrder = purchaseOrderService.addProduct(id, productDTO);
+        return ResponseEntity.ok(updatedOrder);
     }
 }
