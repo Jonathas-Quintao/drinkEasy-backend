@@ -2,6 +2,7 @@ package com.jonathas.drinkeasy.controller;
 
 import com.jonathas.drinkeasy.model.dto.PurchaseItemDTO;
 import com.jonathas.drinkeasy.model.dto.PurchaseOrderDTO;
+import com.jonathas.drinkeasy.model.entity.PurchaseItem;
 import com.jonathas.drinkeasy.service.PurchaseOrderService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class PurchaseOrderController {
     @PutMapping("{id}/add-product")
     public ResponseEntity<PurchaseOrderDTO> addProductToOrder(@PathVariable UUID id, @RequestBody PurchaseItemDTO productDTO){
         PurchaseOrderDTO updatedOrder = purchaseOrderService.addProduct(id, productDTO);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PutMapping("/{id}/remove-product")
+    public ResponseEntity<PurchaseOrderDTO> removeProductFromOrder(@PathVariable UUID id, @RequestBody PurchaseItemDTO productDTO){
+        PurchaseOrderDTO updatedOrder = purchaseOrderService.removeProduct(id, productDTO);
         return ResponseEntity.ok(updatedOrder);
     }
 }
