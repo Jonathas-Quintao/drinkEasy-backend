@@ -1,6 +1,7 @@
 package com.jonathas.drinkeasy.model.entity;
 
 import com.jonathas.drinkeasy.enums.OrderStatus;
+import com.jonathas.drinkeasy.model.dto.OrderItemDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -100,8 +101,17 @@ public class SalesOrder {
 
 
     public void addProduct(OrderItem product){
-        this.products.add(product);
-        this.totalValue += product.calcSubtotal();
+       Optional<OrderItem> existingItem = this.products.stream()
+               .filter(orderItem -> orderItem.getId().equals(product.getId()))
+               .findFirst();
+
+       if(existingItem.isPresent()){
+           OrderItem item = existingItem.get();
+           item.setAmount(item.getAmount() + product.getAmount());
+           item.setUnitValue(product.getUnitValue());
+       }else{
+           this.products.add(product);
+       }
     }
 
 

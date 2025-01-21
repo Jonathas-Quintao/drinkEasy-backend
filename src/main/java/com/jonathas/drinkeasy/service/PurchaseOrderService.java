@@ -66,12 +66,12 @@ public class PurchaseOrderService {
                 .findFirst();
 
         if (existingItem.isPresent()) {
-            // Atualiza o item existente
+
             PurchaseItem item = existingItem.get();
             item.setAmount(item.getAmount() + productDTO.getAmount());
             item.setUnitValue(productDTO.getUnitValue());
         } else {
-            // Cria um novo item
+
             PurchaseItem purchaseItem = new PurchaseItem();
             PurchaseItemPk purchaseItemPk = new PurchaseItemPk();
             purchaseItemPk.setPurchaseOrder(purchaseOrder);
@@ -84,13 +84,13 @@ public class PurchaseOrderService {
             purchaseOrder.getProducts().add(purchaseItem);
         }
 
-        // Recalcula o valor total da ordem de compra
+
         double totalValue = purchaseOrder.getProducts().stream()
                 .mapToDouble(PurchaseItem::calcSubtotal)
                 .sum();
         purchaseOrder.setTotalValue(totalValue);
 
-        // Salva a ordem de compra atualizada
+
         purchaseOrderRepository.save(purchaseOrder);
 
         return convertToDTO(purchaseOrder);

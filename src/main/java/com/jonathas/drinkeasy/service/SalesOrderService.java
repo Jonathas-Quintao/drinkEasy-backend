@@ -49,38 +49,40 @@ public class SalesOrderService {
 
     @Transactional
     public SalesOrderDTO addProduct(UUID salesOrderId, OrderItemDTO productDTO) {
-
         SalesOrder salesOrder = salesOrderRepository.findById(salesOrderId)
-                .orElseThrow(() -> new RuntimeException("Sales Order não encontrado."));
-
+                .orElseThrow(() -> new SalesOrderNotFoundException("Sales Order not found"));
 
         Product product = productRepository.findById(productDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+        Optional<OrderItem> existingItem = salesOrder.getProducts().stream()
+                .filter(item -> item.getId().getProduct().getId().equals(productDTO.getProductId()))
+                .findFirst();
 
-        OrderItem orderItem = new OrderItem();
-        OrderItemPk orderItemPk = new OrderItemPk();
-        orderItemPk.setSalesOrder(salesOrder);
-        orderItemPk.setProduct(product);
-
-        orderItem.setId(orderItemPk);
-        orderItem.setAmount(productDTO.getAmount());
-        orderItem.setUnitValue(productDTO.getUnitValue());
-
-
-        salesOrder.getProducts().add(orderItem);
-
+        if(existingItem.isPresent()){
+            OrderItem item = existingItem.get();
+            item.setAmount(item.getAmount() + productDTO.getAmount());
+            item.setUnitValue(productDTO.getUnitValue());
+        }else{
+            OrderItem orderItem = new OrderItem();
+            OrderItemPk orderItemPk = new OrderItemPk();
+            orderItemPk.setSalesOrder(salesOrder);
+            orderItemPk.setProduct(product);
+            orderItem.setId(orderItemPk);
+            orderItem.setAmount(productDTO.getAmount());
+            orderItem.setUnitValue(productDTO.getUnitValue());
+            salesOrder.getProducts().add(orderItem);
+        }
 
         double totalValue = salesOrder.getProducts().stream()
                 .mapToDouble(OrderItem::calcSubtotal)
                 .sum();
         salesOrder.setTotalValue(totalValue);
 
-
         salesOrderRepository.save(salesOrder);
 
-
         return convertToDTO(salesOrder);
+
     }
 
     @Transactional
